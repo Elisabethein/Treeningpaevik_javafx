@@ -1,0 +1,7 @@
+Jooksmine;2023-04-27;30.0;blablabla lololol
+Suusatamine;2023-05-23;45.0;Päris raske oli sessuhtes
+Tantsimine;2023-05-03;120.0;Võttis võhmale
+Jõusaal;2023-03-03;120.0;vuhvuh
+Jooksime;2023-02-02;30.0;
+Jooks;2023-01-01;49.0;
+Jõuks;2022-12-06;110.0;väsitav!
