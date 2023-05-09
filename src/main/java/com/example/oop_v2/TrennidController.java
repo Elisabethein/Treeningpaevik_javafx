@@ -1,7 +1,6 @@
 package com.example.oop_v2;
 
 import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -14,15 +13,14 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 import java.io.*;
-import java.time.Instant;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class TrennidController {
@@ -40,22 +38,29 @@ public class TrennidController {
     @FXML
     private ListView<String> kõikideTrennideSisu;
     @FXML
-    private Text sõnum;
-    @FXML
     private Button lisa;
     @FXML
     private Button vaata;
     @FXML
     private Button statistika;
+
+    // statistika ekraani nupud
     @FXML
     private Button back;
     @FXML
     private BarChart<String, Integer> kuusKuud;
     @FXML
-    private CategoryAxis x;
+    private CategoryAxis trennidKuusX;
     @FXML
-    private NumberAxis y;
+    private NumberAxis trennidKuusY;
 
+    // trenni lisamisel tekkinud errorite tagasiside tekstid
+    @FXML
+    private Text sõnum;
+    @FXML
+    private Text kuupäevProbleemTekst;
+    @FXML
+    private Text kestvusProbleemTekst;
 
     /**
      * LISA nupule vajutamine: teeb formist saadud info trenni objektiks ja kirjutab selle faili
@@ -66,10 +71,32 @@ public class TrennidController {
             sõnum.setText("Mingi väli on jäänud täitmata!");
             return;
         }
-        LocalDate kuupäev=LocalDate.parse(trenniKuupäev.getText());
-        Trenn uusTrenn=new Trenn(trenniNimi.getText(), kuupäev,Double.parseDouble(trenniKestvus.getText()),trenniSisu.getText());
 
-        KõikTrennid kõikTrennid=new KõikTrennid(kõikTrennid());
+        // peidame probleemi tagasiside tekstid ära enne nende vajaminemist
+        this.kuupäevProbleemTekst.setVisible(false);
+        this.kestvusProbleemTekst.setVisible(false);
+
+        LocalDate kuupäev;
+        try {
+            kuupäev = LocalDate.parse(trenniKuupäev.getText());
+        } catch(DateTimeParseException e) {
+            this.kuupäevProbleemTekst.setText("Kuupäev ei ole sisestatud õigesti. Kasutage formaati 2023-01-01 (aasta, kuu, päev)");
+            this.kuupäevProbleemTekst.setVisible(true);
+            return;
+        }
+
+        double kestvus;
+        try {
+            kestvus = Double.parseDouble(trenniKestvus.getText());
+        } catch(NumberFormatException e) {
+            this.kestvusProbleemTekst.setText("Kestvus peab olema täisarv.");
+            this.kestvusProbleemTekst.setVisible(true);
+            return;
+        }
+
+        Trenn uusTrenn=new Trenn(trenniNimi.getText(), kuupäev, kestvus, trenniSisu.getText());
+
+        KõikTrennid kõikTrennid = new KõikTrennid(kõikTrennid());
         if (!kõikTrennid.getTrennideMap().containsKey(kuupäev)) {
             kõikTrennid.getTrennideMap().put(kuupäev, new ArrayList<>());
         }
@@ -142,8 +169,21 @@ public class TrennidController {
         for (YearMonth yearMonth : trainingsByMonth.keySet()) {
             set.getData().add(new XYChart.Data<>(yearMonth.toString(), trainingsByMonth.getOrDefault(yearMonth,0)));
         }
-        x.setLayoutX(50);
+        trennidKuusX.setLayoutX(50);
         kuusKuud.getData().add(set);
+    }
+
+    public void laeKeskmiseKestvuseDiagramm(KõikTrennid trennid) {
+        LocalDate praeguneKuupäev = LocalDate.now();
+        LocalDate muutuvKuu = LocalDate.of(praeguneKuupäev.getYear(), praeguneKuupäev.getMonth(), 1);
+
+        HashMap<LocalDate, List<Integer>> viimasedKuusKuud = new HashMap<>();
+        for (int i = 0; i < 6; i++) {
+            viimasedKuusKuud.put(muutuvKuu, new ArrayList<>());
+            muutuvKuu = muutuvKuu.minusMonths(1);
+        }
+
+        // siin vaja teha veel filtreerimine kuude kaupa, et saaks keskmiste statistikat teha
     }
 
     /**
@@ -181,7 +221,7 @@ public class TrennidController {
     }
 
     /**
-     *kirjutab faili kõik mingi KõikTrennid välja kõikTrennid sisu
+     * kirjutab faili kõik mingi KõikTrennid välja kõikTrennid sisu
      */
     public void kirjutaFaili(KõikTrennid kõikTrennid) throws IOException {
         try(BufferedWriter bw=new BufferedWriter(new OutputStreamWriter(new FileOutputStream("trennid.txt"), "UTF-8"))){

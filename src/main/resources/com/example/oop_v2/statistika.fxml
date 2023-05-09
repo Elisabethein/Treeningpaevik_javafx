@@ -2,45 +2,38 @@
 
 <?import javafx.scene.chart.BarChart?>
 <?import javafx.scene.chart.CategoryAxis?>
+<?import javafx.scene.chart.LineChart?>
 <?import javafx.scene.chart.NumberAxis?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import javafx.scene.text.Text?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.oop_v2.TrennidController">
+<AnchorPane prefHeight="637.0" prefWidth="1110.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.oop_v2.TrennidController">
    <children>
-      <VBox layoutX="69.0" layoutY="37.0" prefHeight="326.0" prefWidth="461.0">
-         <children>
-            <HBox prefHeight="19.0" prefWidth="461.0" />
-            <HBox prefHeight="28.0" prefWidth="304.0">
-               <children>
-                  <HBox prefHeight="28.0" prefWidth="137.0" />
-                  <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Viimase kuue kuu treeningute arv:" wrappingWidth="179.6953125" />
-               </children>
-            </HBox>
-            <HBox prefHeight="260.0" prefWidth="461.0">
-               <children>
-                  <VBox prefHeight="200.0" prefWidth="100.0" />
-                  <BarChart fx:id="kuusKuud" prefHeight="247.0" prefWidth="577.0">
-                    <xAxis>
-                      <CategoryAxis animated="false" label="Kuud" prefHeight="32.0" prefWidth="350.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" fx:id="x" />
-                    </xAxis>
-                    <yAxis>
-                      <NumberAxis fx:id="y" label="Treeningute arv kuus" side="LEFT" />
-                    </yAxis>
-                  </BarChart>
-               </children>
-            </HBox>
-            <HBox prefHeight="35.0" prefWidth="461.0" />
-            <HBox prefHeight="49.0" prefWidth="461.0">
-               <children>
-                  <VBox prefHeight="75.0" prefWidth="208.0" />
-                  <Button fx:id="back" mnemonicParsing="false" onAction="#onBackButtonPressed" text="Tagasi" />
-               </children>
-            </HBox>
-         </children>
-      </VBox>
+      <BarChart fx:id="kuusKuud" alternativeRowFillVisible="false" layoutX="45.0" layoutY="164.0" prefHeight="310.0" prefWidth="485.0">
+        <xAxis>
+          <CategoryAxis animated="false" label="Kuud" prefHeight="49.0" prefWidth="352.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" fx:id="trennidKuusX" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis fx:id="trennidKuusY" label="Treeningute arv kuus" side="LEFT" />
+        </yAxis>
+      </BarChart>
+      <Button fx:id="back" layoutX="530.0" layoutY="525.0" mnemonicParsing="false" onAction="#onBackButtonPressed" text="Tagasi" />
+      <Text layoutX="506.0" layoutY="65.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Statistika" wrappingWidth="148.654296875">
+         <font>
+            <Font size="36.0" />
+         </font>
+      </Text>
+      <LineChart layoutX="590.0" layoutY="154.0" prefHeight="310.0" prefWidth="485.0">
+        <xAxis>
+          <CategoryAxis label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" />
+        </xAxis>
+        <yAxis>
+          <NumberAxis label="Keskmine treeningu kestvus" side="LEFT" />
+        </yAxis>
+      </LineChart>
+      <Text layoutX="173.0" layoutY="150.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Viimase 6 kuu jooksul tehtud trennid" wrappingWidth="309.13671875" />
+      <Text layoutX="702.0" layoutY="150.0" strokeType="OUTSIDE" strokeWidth="0.0" text="Viimase 6 kuu keskmine trennide kestvus" wrappingWidth="334.13671875" />
    </children>
 </AnchorPane>

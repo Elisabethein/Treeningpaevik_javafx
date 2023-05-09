@@ -23,6 +23,7 @@
                   <HBox prefHeight="26.0" prefWidth="407.0" />
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Sisesta trenni kuupäev kujul yyyy-mm-dd:" wrappingWidth="311.0735778808594" />
                   <TextField fx:id="trenniKuupäev" />
+                  <Text fx:id="kuupäevProbleemTekst" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" wrappingWidth="478.13671875" />
                </children>
             </VBox>
             <HBox prefHeight="38.0" prefWidth="407.0">
@@ -31,6 +32,7 @@
                </children>
             </HBox>
             <TextField fx:id="trenniKestvus" prefHeight="23.0" prefWidth="407.0" />
+            <Text fx:id="kestvusProbleemTekst" fill="RED" strokeType="OUTSIDE" strokeWidth="0.0" text="Text" visible="false" wrappingWidth="479.13671875" />
             <HBox prefHeight="35.0" prefWidth="407.0">
                <children>
                   <Text strokeType="OUTSIDE" strokeWidth="0.0" text="Siseta lisainfot trenni kohta:" wrappingWidth="341.3333435058594" />
