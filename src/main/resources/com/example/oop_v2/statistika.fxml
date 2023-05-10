@@ -25,7 +25,7 @@
             <Font size="36.0" />
          </font>
       </Text>
-      <LineChart layoutX="590.0" layoutY="154.0" prefHeight="310.0" prefWidth="485.0">
+      <LineChart fx:id="kuudeTrenniKestvused" layoutX="590.0" layoutY="154.0" prefHeight="310.0" prefWidth="485.0">
         <xAxis>
           <CategoryAxis label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" />
         </xAxis>

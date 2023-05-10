@@ -7,10 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
-import javafx.scene.chart.BarChart;
-import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.XYChart;
+import javafx.scene.chart.*;
 import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
@@ -47,13 +44,16 @@ public class TrennidController {
     // statistika ekraani nupud
     @FXML
     private Button back;
+
+    // statistikaga seotud muutujad
     @FXML
     private BarChart<String, Integer> kuusKuud;
     @FXML
     private CategoryAxis trennidKuusX;
     @FXML
     private NumberAxis trennidKuusY;
-
+    @FXML
+    private LineChart<String, Number> kuudeTrenniKestvused;
     // trenni lisamisel tekkinud errorite tagasiside tekstid
     @FXML
     private Text sõnum;
@@ -149,6 +149,7 @@ public class TrennidController {
         TrennidController controller = loader.getController();
         KõikTrennid kõik=new KõikTrennid(kõikTrennid());
         controller.initializeChart(kõik);
+        controller.laeKeskmiseKestvuseDiagramm(kõik);
     }
     public void initializeChart(KõikTrennid trennid) {
         SortedSet<LocalDate> sorted = new TreeSet<>(trennid.getTrennideMap().keySet());
@@ -177,13 +178,39 @@ public class TrennidController {
         LocalDate praeguneKuupäev = LocalDate.now();
         LocalDate muutuvKuu = LocalDate.of(praeguneKuupäev.getYear(), praeguneKuupäev.getMonth(), 1);
 
-        HashMap<LocalDate, List<Integer>> viimasedKuusKuud = new HashMap<>();
+        HashMap<LocalDate, List<Double>> viimasedKuusKuud = new HashMap<>();
         for (int i = 0; i < 6; i++) {
             viimasedKuusKuud.put(muutuvKuu, new ArrayList<>());
             muutuvKuu = muutuvKuu.minusMonths(1);
         }
 
         // siin vaja teha veel filtreerimine kuude kaupa, et saaks keskmiste statistikat teha
+        for(LocalDate trenniKuupäev : trennid.getTrennideMap().keySet()) {
+            LocalDate trenniKuu = LocalDate.of(trenniKuupäev.getYear(), trenniKuupäev.getMonth(), 1);
+            if(!viimasedKuusKuud.containsKey(trenniKuu))
+                continue;
+
+            // lisab trennide kestvused viimase kuue kuu hashmapi mingi kindla kuu juurde
+            for(Trenn trenn : trennid.getTrennideMap().get(trenniKuupäev))
+                viimasedKuusKuud.get(trenniKuu).add(trenn.getKestvus());
+        }
+
+        // loob charti jaoks keskmiste aegade andmed
+        XYChart.Series<String, Number> andmed = new XYChart.Series<>();
+        for(LocalDate kuu : viimasedKuusKuud.keySet()) {
+            // arvutab keskmise 1 kuu jaoks
+            double kestvusedKokku = 0;
+            int trenneKokku = viimasedKuusKuud.get(kuu).size();
+            for(double kestvus : viimasedKuusKuud.get(kuu))
+                kestvusedKokku += kestvus;
+
+            double keskmine = kestvusedKokku / trenneKokku;
+
+            andmed.getData().add(new XYChart.Data<>(kuu.toString(), keskmine));
+        }
+
+        // paneb andmed joonediagrammi
+        this.kuudeTrenniKestvused.getData().add(andmed);
     }
 
     /**
