@@ -1,4 +1,5 @@
 Jooksmine;2023-04-27;30.0;blablabla lololol
+Proov;2023-05-10;45.0;
 Suusatamine;2023-05-23;45.0;Päris raske oli sessuhtes
 Jõuks;2022-12-06;110.0;väsitav!
 Tantsimine;2023-05-03;120.0;Võttis võhmale

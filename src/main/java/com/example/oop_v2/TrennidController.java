@@ -4,6 +4,7 @@ import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Node;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
@@ -12,6 +13,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ListView;
 import javafx.scene.control.TextField;
 import javafx.scene.text.Text;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 import java.io.*;
@@ -21,9 +23,7 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class TrennidController {
-    private Stage stage;
-    private Scene scene;
-    private Parent root;
+    // Trenni isenditele vajaminevad väljad:
     @FXML
     private TextField trenniNimi;
     @FXML
@@ -32,16 +32,16 @@ public class TrennidController {
     private TextField trenniKestvus;
     @FXML
     private TextField trenniSisu;
+    //trennide kuvamine:
     @FXML
     private ListView<String> kõikideTrennideSisu;
+    //kõik nupud:
     @FXML
     private Button lisa;
     @FXML
     private Button vaata;
     @FXML
     private Button statistika;
-
-    // statistika ekraani nupud
     @FXML
     private Button back;
 
@@ -70,6 +70,7 @@ public class TrennidController {
      */
     @FXML
     protected void onlisaButtonClick() throws IOException {
+        //kui mingi vajalik väli on täitmata anname sellest teada
         if (trenniNimi.getText().isEmpty() || trenniKestvus.getText().isEmpty() || trenniKuupäev.getText().isEmpty()){
             sõnum.setText("Mingi väli on jäänud täitmata!");
             return;
@@ -79,6 +80,7 @@ public class TrennidController {
         this.kuupäevProbleemTekst.setVisible(false);
         this.kestvusProbleemTekst.setVisible(false);
 
+        //probleem kuupäevaga:
         LocalDate kuupäev;
         try {
             kuupäev = LocalDate.parse(trenniKuupäev.getText());
@@ -87,7 +89,7 @@ public class TrennidController {
             this.kuupäevProbleemTekst.setVisible(true);
             return;
         }
-
+        //probleem kestvusega:
         double kestvus;
         try {
             kestvus = Double.parseDouble(trenniKestvus.getText());
@@ -96,7 +98,9 @@ public class TrennidController {
             this.kestvusProbleemTekst.setVisible(true);
             return;
         }
-
+        //loome uue Trenni isendi ja KõikTrennid isendi
+        //selleks loeme failist kõik trennid sisse, lisame just loodud trenni ja kirjutame uuesti faili
+        //failis on trennid kuu järgi sorteeritud sel juhul
         Trenn uusTrenn=new Trenn(trenniNimi.getText(), kuupäev, kestvus, trenniSisu.getText());
 
         KõikTrennid kõikTrennid = new KõikTrennid(kõikTrennid());
@@ -114,19 +118,21 @@ public class TrennidController {
     }
 
     /**
-     * kui soovitakse vaadata trenide sisu
+     * VAATA nupp: kui soovitakse vaadata trenide sisu
      */
     @FXML
     public void onVaataButtonPressed(ActionEvent event) throws IOException {
+        //muudame stseeni
         FXMLLoader loader = new FXMLLoader(getClass().getResource("trennideKuvamine.fxml"));
         Parent root = loader.load();
         TrennidController controller = loader.getController();
 
-        Scene scene = new Scene(root);
-        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-        stage.show();
 
+        Scene scene = new Scene(root, 600, 600);
+        Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
+        resize(stage, scene);
+
+        //loeme kõik trennid sisse ning paneme ListViewi
         KõikTrennid kõikTrennid = new KõikTrennid(kõikTrennid());
         ArrayList<String> kirjuta = new ArrayList<>();
         for (ArrayList<Trenn> trennideList : kõikTrennid.getTrennideMap().values()) {
@@ -137,41 +143,57 @@ public class TrennidController {
         String[] strings = kirjuta.toArray(String[]::new);
         controller.initializeListView(strings);
     }
+
+
+    /**
+     * meetod tekitab listview-le sius
+     */
     public void initializeListView(String[] sisu) {
         kõikideTrennideSisu.setItems(FXCollections.observableArrayList(sisu));
     }
+    /**
+     * STATISTIKA nupp: soovitakse vaadata trennide statistikat
+     */
     @FXML
     public void onStatistikaButtonPressed(ActionEvent event) throws IOException {
+        //muudame steeni
         FXMLLoader loader = new FXMLLoader(getClass().getResource("statistika.fxml"));
         Parent root = loader.load();
-        Scene scene = new Scene(root);
+        Scene scene = new Scene(root, 1100, 600);
         Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-        stage.setScene(scene);
-        stage.show();
+        resize(stage, scene);
 
         TrennidController controller = loader.getController();
         KõikTrennid kõik=new KõikTrennid(kõikTrennid());
-        controller.initializeChart(kõik);
+        controller.laeTrennideArvuDiagramm(kõik);
         controller.laeKeskmiseKestvuseDiagramm(kõik);
     }
-    public void initializeChart(KõikTrennid trennid) {
-        SortedSet<LocalDate> sorted = new TreeSet<>(trennid.getTrennideMap().keySet());
-        Map<YearMonth, Integer> trainingsByMonth = new LinkedHashMap<>();
 
-        YearMonth currentDate = YearMonth.from(LocalDate.now());
-        YearMonth sixMonthsAgo = currentDate.minusMonths(6);
+    /**
+     * tekitame graafikule sisu
+     */
+    public void laeTrennideArvuDiagramm(KõikTrennid trennid) {
+        //sorteerime trennid kuupäeva järgi
+        SortedSet<LocalDate> sorteeritud = new TreeSet<>(trennid.getTrennideMap().keySet());
+        //siia kogume trennid ja nende arvu
+        Map<YearMonth, Integer> treeninguteArv = new LinkedHashMap<>();
 
-        for (LocalDate kp:sorted) {
+        YearMonth praeguneKuu = YearMonth.from(LocalDate.now());
+        YearMonth kuusKuudTagasi = praeguneKuu.minusMonths(6);
+
+        //kui trenn toimus viimase kuu vahemikus siis lisame selle treeninguteArvu
+        for (LocalDate kp:sorteeritud) {
             YearMonth yearMonth = YearMonth.from(kp);
-            if (yearMonth.isBefore(sixMonthsAgo)) {
-                continue; // skip dates outside the last 6 months range
+            if (yearMonth.isBefore(kuusKuudTagasi)) {
+                continue;
             }
-            trainingsByMonth.put(yearMonth,  trainingsByMonth.getOrDefault(yearMonth, 0)+trennid.getTrennideMap().get(kp).size());
+            treeninguteArv.put(yearMonth,  treeninguteArv.getOrDefault(yearMonth, 0)+trennid.getTrennideMap().get(kp).size());
         }
 
+        //igale kuule loome oma tulba
         XYChart.Series<String, Integer> set=new XYChart.Series<>();
-        for (YearMonth yearMonth : trainingsByMonth.keySet()) {
-            set.getData().add(new XYChart.Data<>(yearMonth.toString(), trainingsByMonth.getOrDefault(yearMonth,0)));
+        for (YearMonth yearMonth : treeninguteArv.keySet()) {
+            set.getData().add(new XYChart.Data<>(yearMonth.toString(), treeninguteArv.getOrDefault(yearMonth,0)));
         }
         trennidKuusX.setLayoutX(50);
         kuusKuud.getData().add(set);
@@ -219,14 +241,29 @@ public class TrennidController {
     }
 
     /**
-     * viib tagasi
+     * TAGASI nupp:viib tagasi
      */
     @FXML
     public void onBackButtonPressed(ActionEvent event) throws IOException{
+        //uus stseen
         Parent root= FXMLLoader.load(getClass().getResource("trennid.fxml"));
-        stage=(Stage)((Node)event.getSource()).getScene().getWindow();
-        scene=new Scene(root);
+        Stage stage=(Stage)((Node)event.getSource()).getScene().getWindow();
+        Scene scene=new Scene(root, 600, 600);
+        resize(stage, scene);
+    }
+
+    /**
+     * meetod mis paneb stseeni keset kasutaja ekraani, sest erinevad steenid on eri suurusega
+     */
+    static void resize(Stage stage, Scene scene) {
         stage.setScene(scene);
+        Rectangle2D screenBounds = Screen.getPrimary().getVisualBounds();
+        double centerX = screenBounds.getMinX() + screenBounds.getWidth() / 2;
+        double centerY = screenBounds.getMinY() + screenBounds.getHeight() / 2;
+        double stageX = centerX - scene.getWidth() / 2;
+        double stageY = centerY - scene.getHeight() / 2;
+        stage.setX(stageX);
+        stage.setY(stageY);
         stage.show();
     }
 
