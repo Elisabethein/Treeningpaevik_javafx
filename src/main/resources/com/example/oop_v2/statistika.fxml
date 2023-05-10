@@ -11,9 +11,9 @@
 
 <AnchorPane prefHeight="637.0" prefWidth="1110.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.example.oop_v2.TrennidController">
    <children>
-      <BarChart fx:id="kuusKuud" alternativeRowFillVisible="false" layoutX="45.0" layoutY="164.0" prefHeight="310.0" prefWidth="485.0">
+      <BarChart fx:id="kuusKuud" alternativeRowFillVisible="false" layoutX="45.0" layoutY="164.0" legendVisible="false" prefHeight="310.0" prefWidth="485.0">
         <xAxis>
-          <CategoryAxis animated="false" label="Kuud" prefHeight="49.0" prefWidth="352.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" fx:id="trennidKuusX" />
+          <CategoryAxis fx:id="trennidKuusX" animated="false" label="Kuud" prefHeight="49.0" prefWidth="352.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" />
         </xAxis>
         <yAxis>
           <NumberAxis fx:id="trennidKuusY" label="Treeningute arv kuus" side="LEFT" />
@@ -25,9 +25,9 @@
             <Font size="36.0" />
          </font>
       </Text>
-      <LineChart fx:id="kuudeTrenniKestvused" layoutX="590.0" layoutY="154.0" prefHeight="310.0" prefWidth="485.0">
+      <LineChart fx:id="kuudeTrenniKestvused" layoutX="590.0" layoutY="154.0" legendVisible="false" prefHeight="310.0" prefWidth="485.0">
         <xAxis>
-          <CategoryAxis label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" />
+          <CategoryAxis fx:id="kuudeTrenniKestvusedX" label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" />
         </xAxis>
         <yAxis>
           <NumberAxis label="Keskmine treeningu kestvus" side="LEFT" />

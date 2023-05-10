@@ -54,6 +54,9 @@ public class TrennidController {
     private NumberAxis trennidKuusY;
     @FXML
     private LineChart<String, Number> kuudeTrenniKestvused;
+    @FXML
+    private CategoryAxis kuudeTrenniKestvusedX;
+
     // trenni lisamisel tekkinud errorite tagasiside tekstid
     @FXML
     private Text sõnum;
@@ -198,6 +201,7 @@ public class TrennidController {
         // loob charti jaoks keskmiste aegade andmed
         XYChart.Series<String, Number> andmed = new XYChart.Series<>();
         for(LocalDate kuu : viimasedKuusKuud.keySet()) {
+
             // arvutab keskmise 1 kuu jaoks
             double kestvusedKokku = 0;
             int trenneKokku = viimasedKuusKuud.get(kuu).size();
@@ -210,6 +214,7 @@ public class TrennidController {
         }
 
         // paneb andmed joonediagrammi
+        this.kuudeTrenniKestvusedX.setLayoutX(50.0);
         this.kuudeTrenniKestvused.getData().add(andmed);
     }
 
