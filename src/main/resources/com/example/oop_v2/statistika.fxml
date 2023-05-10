@@ -27,7 +27,7 @@
       </Text>
       <LineChart fx:id="kuudeTrenniKestvused" layoutX="590.0" layoutY="154.0" legendVisible="false" prefHeight="310.0" prefWidth="485.0">
         <xAxis>
-          <CategoryAxis fx:id="kuudeTrenniKestvusedX" label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" />
+          <CategoryAxis fx:id="kuudeTrenniKestvusedX" animated="false" label="Kuud" prefHeight="38.0" prefWidth="428.0" side="BOTTOM" tickLabelGap="1.0" tickLength="7.0" />
         </xAxis>
         <yAxis>
           <NumberAxis label="Keskmine treeningu kestvus" side="LEFT" />
